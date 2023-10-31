@@ -1,0 +1,82 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    {include file="layout:_meta" /}
+    <title>编辑短信模板 - 短信模板管理</title>
+</head>
+<body>
+<article class="cl pd-20">
+    <form class="form form-horizontal" id="form-admin">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>发送手机号：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <textarea type="text" placeholder="多个手机号请用逗号隔开 ," class="input-text" v-model="model.phones" style="height: 200px"></textarea>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>短信服务商：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <span class="select-box">
+                    <select class="select"  size="1" v-model="model.tid">
+                        <option  value="">请选择短信服务商</option>
+                        {volist name="template" id="vo"}
+                            <option value="{$vo.id}">{$vo.template_name }</option>
+                        {/volist}
+                    </select>
+				</span>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input class="btn btn-primary radius" v-on:click="doSubmit()" value="提交">
+            </div>
+        </div>
+    </form>
+</article>
+
+<!--_footer 作为公共模版分离出去-->
+{include file="layout:_footer" /}
+<!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    var model = {
+        sid:"{$edit_id}",
+        tid:'',
+        phones:''
+    };
+
+    var store_model = new Vue({
+        el: "#form-admin",
+        data: {
+            model:model,
+            service: []
+        },
+        methods: {
+
+            doSubmit: function() {
+                $.ajax({
+                    type:'post',
+                    data:this.model,
+                    url:"{:url('service/send')}",
+                    cache: false,
+                    dataType:'json',
+                    success:function(data){
+                        if(data.status==true){
+                            layer.msg(data.message,function () {
+                                parent.location.href="{:url('template/index')}";
+                            })
+                        }else {
+                            layer.msg(data.message);
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

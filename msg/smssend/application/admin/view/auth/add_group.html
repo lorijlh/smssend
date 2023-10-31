@@ -1,0 +1,141 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    {include file="layout:_meta" /}
+    <title>添加角色</title>
+</head>
+<body>
+<article id="form-admin" class="page-container">
+    <form class="form form-horizontal" id="form-admin-role-add">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>角色名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="" placeholder="" v-model="model.title">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>是否启用：</label>
+            <div class="formControls col-xs-8 col-sm-9 skin-minimal">
+                <div class="radio-box">
+                    <input value="1" type="radio" id="sex-1" v-model="model.status">
+                    <label for="sex-1">启用</label>
+                </div>
+                <div class="radio-box">
+                    <input value="0" type="radio" id="sex-2"  v-model="model.status">
+                    <label for="sex-2">禁用</label>
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">角色权限：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <dl v-for="(menus,one) in rules" class="permission-list">
+                    <dt>
+                        <label>
+                            <input type="checkbox" v-on:click="oneCheck($event)" :id="'user-Character-'+one">
+                            {{menus.title}}</label>
+                    </dt>
+                    <dd>
+                        <dl v-for="(menu,two) in menus._data" class="cl permission-list2">
+                            <dt>
+                                <label class="">
+                                    <input type="checkbox" value="" :id="'user-Character-'+one+'-'+two">
+                                    {{menu.title}}</label>
+                            </dt>
+                            <dd>
+                                <label v-for="(item,three) in menu._data">
+                                    <input v-on:click="twoCheck($event)" type="checkbox" v-model="model.rules" v-bind:value="item.id" :id="'user-Character-'+one+'-'+two+'-'+three">
+                                    {{item.title}}
+                                </label>
+                            </dd>
+                        </dl>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <button type="button" class="btn btn-success radius"  v-on:click="doSubmit()"><i class="icon-ok"></i> 确定</button>
+            </div>
+        </div>
+    </form>
+</article>
+
+<!--_footer 作为公共模版分离出去-->
+{include file="layout:_footer" /}
+<!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+
+    var model = {
+        rules:[],
+        model:{
+            title:'',
+            status:1,
+            rules:[]  //选中的权限
+        }
+    };
+    var store_model = new Vue({
+        el: "#form-admin",
+        data: model,
+        methods: {
+            //一级父选框
+            oneCheck:function (event) {
+                var _this = $(event.currentTarget);
+                $(_this).closest("dl").find("dd input:checkbox").prop("checked",$(_this).prop("checked"));
+                $(_this).closest("dl").find("dd input:checkbox").each(function(j,item){
+                    // 你要实现的业务逻辑
+                    if(item.value!=''){
+                        store_model.model.rules.push(item.value);
+                    }
+                });
+                //console.log(this.model.rules);  //输出input 中的 value 值到控制台
+
+            },
+            //二级父选框
+            twoCheck:function (event) {
+                var _this = $(event.currentTarget);
+                var l =$(_this).parent().parent().find("input:checked").length;
+                var l2=$(_this).parents(".permission-list").find(".permission-list2 dd").find("input:checked").length;
+                if($(_this).prop("checked")){
+                    $(_this).closest("dl").find("dt input:checkbox").prop("checked",true);
+                    $(_this).parents(".permission-list").find("dt").first().find("input:checkbox").prop("checked",true);
+                }else{
+                    if(l==0){
+                        $(_this).closest("dl").find("dt input:checkbox").prop("checked",false);
+                    }
+                    if(l2==0){
+                        $(_this).parents(".permission-list").find("dt").first().find("input:checkbox").prop("checked",false);
+                    }
+                }
+            },
+            doSubmit: function() {
+                $.ajax({
+                    type:'post',
+                    data:this.model,
+                    url:"{:url('auth/add_group')}",
+                    cache: false,
+                    dataType:'json',
+                    success:function(data){
+                        if(data.status==true){
+                            layer.msg(data.message,function () {
+                                parent.location.href="{:url('auth/group_list')}";
+                            })
+                        }else {
+                            layer.msg(data.message);
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    util.get("{:url('auth/add_group')}",function (data) {
+        store_model.rules = data;
+    });
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

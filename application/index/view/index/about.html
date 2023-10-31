@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0">
+  <title>{:config('base.web_name')}-关于</title>
+  <meta name="keywords" content="{:config('base.keywords')}">
+  <meta name="description" content="{:config('base.description')}">
+  <link rel="stylesheet" href="__static__/layui/css/layui.css">
+  <link rel="stylesheet" href="__static__/index/css/index.css">
+</head>
+<body>
+  <!-- nav部分 -->
+  {include file="layout:nav" /}
+  <!-- banner部分 -->
+  <div class="banner about">
+    <div class="title">
+      <p>关于我们</p>
+      <p class="en">About Us</p>
+    </div>
+  </div>
+  <!-- main部分 -->
+  <div class="main-about">
+    <div class="layui-container">
+      <div class="layui-row">
+        <ul class="aboutab">
+          <li class="layui-this">软件简介</li><li>版本迭代</li>
+        </ul>
+        <div class="tabIntro">
+          <div class="content">
+            <div class="layui-inline img"><img src="__static__/index/img/us_img1.jpg"></div><div class="layui-inline panel">
+              <p>从营销的角度来讲的话，任何一种营销方式呢，他的目的都只有一个，将自己的产品呈现在顾客面前。所以尽管短信群发平台在很多人看来是一种传统的营销推广手段，但在我看了，如果能够掌握短信营销的方法技巧，它的作用将不啻于其他的网络营销方式，比如说竞价，微信，信息流推广等。</p>
+              <p>1.不可或缺：手机在基本上已经普及到了每一个人</p>
+              <p>2.成本低：短信群发成本很低。举例，发送1万封短信的成本是600元左右</p>
+              <p>3.个性化：可以针对不同的用户推荐不同的内容。</p>
+              <p>4.实时性：可以由发送者来决定推送的时机</p>
+              <p>5.功能性：可以嵌套一些功能性的内容，比如调研问卷。</p>
+          </div>
+          </div>
+        </div>
+        <div class="tabCour">
+          <p class="title">迭代历程</p>
+          <ul class="timeline">
+            <li class="odd">
+              <div class="cour-img"><img src="__static__/index/img/us_img4.png"></div>
+              <div class="cour-panel layui-col-sm4 layui-col-lg5">
+                <p class="label">2021 年 2 月</p>
+                <p>v2.0版 将此工具建设为平台版本可以大家一起在线使用此工具的优秀功能</p>
+              </div>
+            </li>
+            <li>
+              <div class="cour-img"><img src="__static__/index/img/us_img5.png"></div>
+              <div class="cour-panel layui-col-sm4 layui-col-sm-offset8 layui-col-lg5 layui-col-lg-offset7">
+                <p class="label">2021 年 1 月</p>
+                <p>v1.3版 适配Windows系统，并且能能一键安装</p>
+              </div>
+            </li>
+            <li class="odd">
+              <div class="cour-img"><img src="__static__/index/img/us_img6.png"></div>
+              <div class="cour-panel layui-col-sm4 layui-col-lg5">
+                <p class="label">2020 年 12 月</p>
+                <p>v1.2版 增加了短信服务商，让群发有可选的余地</p>
+              </div>
+            </li>
+            <li>
+              <div class="cour-img"><img src="__static__/index/img/us_img7.png"></div>
+              <div class="cour-panel layui-col-sm4 layui-col-sm-offset8 layui-col-lg5 layui-col-lg-offset7">
+                <p class="label">2019 年 10 月</p>
+                <p>v1.0版 我们我们因为，需要业务发展需要群发短信营销。模板审核比较严，创立了绕过模板的短信群发系统工具</p>
+              </div>
+            </li>
+            <li class="odd">
+              <div class="cour-img"><img src="__static__/index/img/us_img8.png"></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- footer部分 -->
+  {include file="layout:footer" /}
+<script>
+  layui.config({
+    base: '__static__/index/js/'
+  }).use('firm'); 
+</script>
+</body>
+</html>

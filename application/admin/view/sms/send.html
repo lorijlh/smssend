@@ -1,0 +1,102 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    {include file="layout:_meta" /}
+    <title>发送短信</title>
+    <link href="__static__/admin/css/jquery.searchableSelect.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<article class="cl pd-20">
+    <form class="form form-horizontal" id="form-admin">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>模板：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                 
+                <select class="" id="template_id" name="template_id" onchange="getTemplateContent();">
+                    <option  value="">请选择</option>
+                    {foreach $template as $k=>$v}
+                    <option value="{$v.id}">{$v.template_name}</option>  
+                    {/foreach}
+                </select>
+                 
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">模板内容：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                 <span id="template_content"></span>
+                 
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>群组：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                
+                    <select class=""  id="tag" name="tag">
+                        <option  value="">请选择</option>
+                        {foreach $tag as $k=>$v}
+                        <option value="{$v}">{$v}</option>  
+                        {/foreach}
+                    </select>
+                 
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">发送手机号：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <textarea type="text" id="phones" placeholder="多个手机号请用逗号(,)隔开" class="input-text" name="phones" style="height: 100px"></textarea>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input class="btn btn-primary radius" onclick="doSubmit()" value="发送短信">
+            </div>
+        </div>
+    </form>
+</article>
+
+<!--_footer 作为公共模版分离出去-->
+{include file="layout:_footer" /}
+<!--/_footer 作为公共模版分离出去-->
+<script src="__static__/admin/js/jquery-1.11.1.min.js"></script>
+<script src="__static__/admin/js/jquery.searchableSelect.js"></script>
+<script>
+    $(function(){
+        $('#template_id').searchableSelect();
+        $('#tag').searchableSelect();
+    });
+</script>
+<script type="text/javascript">
+    function getTemplateContent(){
+        var template_id = $("#template_id option:selected").val();　　　　//获取选中项的值;
+        console.log(template_id);
+        if (template_id!=''){
+            $.get("{:url('sms/send')}", {template_id:template_id}, function (data) {
+                $('#template_content').html(data.message);
+            }, 'json');
+        }else{
+            $('#template_content').html('');
+        }
+    }
+    function doSubmit(){
+        var template_id = $("#template_id option:selected").val();　　　　//获取选中项的值;
+        var tag = $("#tag option:selected").val();
+        var phones = $("#phones").val();
+        $.post("{:url('sms/send')}", {template_id:template_id,tag:tag,phones:phones}, function (data) {
+            if (data.status == true) {
+                layer.msg(data.message, function () {
+                    parent.location.href="{:url('sms/index')}";
+                    //layer_close();
+                })
+            } else {
+                layer.msg(data.message);
+            }
+        }, 'json');
+    }
+    
+
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

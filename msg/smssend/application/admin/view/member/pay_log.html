@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    {include file="layout:_meta" /}
+    <title>群发对象</title>
+</head>
+<body>
+<nav class="breadcrumb">
+    <i class="Hui-iconfont">&#xe67f;</i>
+    首页 <span class="c-gray en">&gt;</span>
+    个人中心 <span class="c-gray en">&gt;</span>
+    充值记录
+    <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+       href="javascript:location.replace(location.href);" title="刷新">
+        <i class="Hui-iconfont">&#xe68f;</i>
+    </a>
+</nav>
+<div id="table" class="page-container">
+    <div class="text-c">
+        <input id="create_time" type="text" class="input-text" v-model="search.create_time"  style="width:350px" placeholder="请选择下单时间范围">
+        <input type="text" class="input-text"  v-model="search.out_trade_no" style="width:250px" placeholder="请输入订单号" v-on:keyup.enter="btnSearch()">
+        <button type="submit" v-on:click="btnSearch()" class="btn btn-success" name=""><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+    </div>
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="r">共有数据：<strong>{{count}}</strong> 条</span>
+    </div>
+    <table class="table table-border table-bordered table-bg">
+        <thead>
+        <tr>
+            <th scope="col" colspan="10">充值记录</th>
+        </tr>
+        <tr class="text-c">
+            <th width="25"><input type="checkbox" name="" value=""></th>
+            <th width="50">ID</th>
+            <th>订单号</th>
+            <th >充值金额</th>
+            <th >赠送金额</th>
+            <th >支付渠道</th>
+            <th >支付状态</th>
+            <th >下单时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="text-c" v-for="(item,index)  in lists">
+            <td><input type="checkbox" v-bind:value="item.id" name="ids"></td>
+            <td>{{item.id}}</td>
+            <td>{{item.out_trade_no}}</td>
+            <td>{{item.amount}}</td>
+            <td>{{item.give_amount}}</td>
+            <td>
+                <a v-if="item.type=='usdt'" class="btn btn-primary size-MINI radius">USDT</a>
+                <a v-if="item.type=='bank'" class="btn btn-success size-MINI radius">银行卡</a>
+                <a v-if="item.type=='alipay'" class="btn btn-warning size-MINI radius">支付宝</a>
+            </td>
+            <td>
+                <a v-if="item.state==0" class="btn btn-primary size-MINI radius">待审核</a>
+                <a v-if="item.state==1" class="btn btn-success size-MINI radius">支付成功</a>
+                <a v-if="item.state==2" class="btn btn-warning size-MINI radius">支付失败</a>
+            </td>
+            <td>{{item.create_time,'yyyy-MM-dd HH:mm:ss'|timeFormat}}</td>
+        </tr>
+        </tbody>
+    </table>
+    <!--vueJS分页---start-->
+    <div class="pagination">
+        <ul>
+            <li v-if="current>1"><a v-on:click="current--,pageClick()">上一页</a></li>
+            <li v-if="current==1"><a class="banclick">上一页</a></li>
+            <li v-for="index in indexs"  v-bind:class="{ 'active': current == index}">
+                <a v-on:click="btnClick(index)">{{ index }}</a>
+            </li>
+            <li v-if="current!=total"><a v-on:click="current++,pageClick()">下一页</a></li>
+            <li v-if="current == total"><a class="banclick">下一页</a></li>
+            <li><a>共<i>{{total}}</i>页</a></li>
+        </ul>
+    </div>
+    <!--vueJS分页---end-->
+</div>
+<!--_footer 作为公共模版分离出去-->
+{include file="layout:_footer" /}
+<!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+
+<!--<script type="text/javascript" src="lib/laypage/1.2/laypage.js"></script>-->
+<script type="text/javascript">
+    var models = {
+        show:{},
+
+        count:0,
+        lists: [],//表格数据
+        total:1, //总页数
+        current:1,  //当前页码
+        search:{}   //搜索框
+    };
+
+    var app_model = new Vue({
+        el: "#table",
+        data: models,
+        mounted: function () {
+            this.checkAuth();
+            this.initTime();
+        },
+        methods: {
+
+            //初始化时间
+            initTime:function () {
+                laydate.render({
+                    elem: '#create_time',type:'datetime',range: true,
+                    done: function(value, date, endDate){
+                        app_model.search.create_time = value;
+                    }
+                });
+            },
+
+            //上一页,下一页翻页
+            pageClick: function(){
+                initTable("{:url('member/pay_log')}",this.current,this.search);
+            },
+
+            //点击页码
+            btnClick: function(data){
+                if(data != this.current){
+                    this.current = data;
+                    initTable("{:url('member/pay_log')}",this.current,this.search);
+                }
+            },
+
+            //搜索框搜索
+            btnSearch:function () {
+                initTable("{:url('member/pay_log')}",this.current,this.search);
+            }
+
+        },
+
+        //分页
+        computed: {
+            indexs: function () {
+                var left = 1;
+                var right = this.total;
+                var ar = [];
+                if (this.total >= 5) {
+                    if (this.current > 3 && this.current < this.total - 2) {
+                        left = this.current - 2;
+                        right =left + 4;
+                    } else {
+                        if (this.current <= 3) {
+                            left = 1;
+                            right = 5;
+                        } else {
+                            right = this.total;
+                            left = this.total - 4;
+                        }
+                    }
+                }
+                while (left <= right) {
+                    ar.push(left);
+                    left++;
+                }
+                return ar
+            }
+        }
+    });
+    //初始化数据表格
+    initTable("{:url('member/pay_log')}");
+</script>
+</body>
+</html>

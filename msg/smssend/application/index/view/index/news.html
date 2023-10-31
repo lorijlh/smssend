@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0">
+    <title>{:config('base.web_name')}-技术文档</title>
+    <meta name="keywords" content="{:config('base.keywords')}">
+    <meta name="description" content="{:config('base.description')}">
+    <link rel="stylesheet" href="__static__/layui/css/layui.css">
+    <link rel="stylesheet" href="__static__/index/css/index.css">
+</head>
+<body>
+<!-- nav部分 -->
+{include file="layout:nav" /}
+<!-- banner部分 -->
+<div class="banner news">
+    <div class="title">
+        <p>平台使用文档</p>
+        <p class="en">use zhe software's World</p>
+    </div>
+</div>
+<!-- main -->
+<div class="main-news">
+    <div class="layui-container">
+        <div class="layui-row layui-col-space20" id="world_view">
+            <!--列表视图-->
+        </div>
+        <textarea title="文档模板" id="world_tpl" style="display:none;">
+           {{#  layui.each(d.list, function(index, item){ }}
+             <div class="layui-col-lg6 content">
+                <div>
+                    <div class="news-img"><a href="{:url('index/detail')}?id={{item.id}}"><img src="{{item.thumb_img}}"></a></div><div class="news-panel">
+                    <strong><a href="{:url('index/detail')}?id={{item.id}}">{{item.title}}</a></strong>
+                    <p class="detail"><span>{{item.des}}</span><a href="{:url('index/detail')}?id={{item.id}}">[详细]</a></p>
+                    <p class="read-push">阅读 <span>{{item.read}}</span>&nbsp;&nbsp;&nbsp;&nbsp;发布时间：<span>{{item.create_time}}</span>&nbsp;&nbsp;作者：<span>&#20992;&#23458;&#28304;&#30721;&#32593;</span></p>
+                </div>
+                </div>
+            </div>
+          {{#  }); }}
+      </textarea>
+        <div id="newsPage"></div>
+    </div>
+</div>
+<!-- footer部分 -->
+{include file="layout:footer" /}
+<script>
+    layui.config({
+        base: '__static__/index/js/'
+    }).use(['firm','laypage','laytpl'],function () {
+        var form = layui.form, laypage = layui.laypage, $ = layui.jquery,laytpl = layui.laytpl;
+
+        initList(1,function (count) {
+            laypage.render({
+                elem: 'newsPage'
+                ,count: count //数据总数，从服务端得到
+                ,jump: function(obj, first){
+                    //首次不执行
+                    if(!first){
+                        initList(obj.curr);
+                    }
+                }
+            });
+        });
+
+        //初始化列表
+        function initList(page,callback) {
+            if (page==undefined){
+                page =1;
+            }
+
+            $.get('{url("index/news")}',{page:page},function (res) {
+                var html = laytpl(world_tpl.value).render({
+                    list: res.data.data
+                });
+                $('#world_view').html(html);
+
+                //如果是回调函数
+                if (typeof callback === "function"){
+                    callback(res.data.total)
+                }
+
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

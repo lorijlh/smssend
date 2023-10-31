@@ -1,0 +1,108 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    {include file="layout:_meta" /}
+    <title>编辑菜单</title>
+</head>
+<body>
+<article class="cl pd-20">
+    <form class="form form-horizontal" id="form-admin">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"> 图标地址：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <i class="Hui-iconfont">&#xe6f1;</i>
+                <a href="http://www.h-ui.net/Hui-3.7-Hui-iconfont.shtml" target="_blank">http://www.h-ui.net/Hui-3.7-Hui-iconfont.shtml</a>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>上级菜单：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <span class="select-box">
+                    <select class="select" v-model="model.pid">
+                        <option value="0">一级菜单</option>
+                        <option v-for="option in menus" v-bind:value="option.id">{{option.title}}</option>
+                    </select>
+                </span>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>菜单名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" v-model="model.title" placeholder="请输入菜单名称">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">菜单链接：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" v-model="model.link" placeholder="请输入菜单链接">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">菜单图标：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" v-model="model.icon" placeholder="请输入图标">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">菜单排序：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="number" class="input-text" v-model="model.sort" placeholder="请输入1-99的整数">
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input class="btn btn-primary radius" v-on:click="doSubmit()" value="提交">
+            </div>
+        </div>
+    </form>
+</article>
+
+<!--_footer 作为公共模版分离出去-->
+{include file="layout:_footer" /}
+<!--/_footer 作为公共模版分离出去-->
+<script type="text/javascript">
+    var model = {
+        menus: [],
+        model: {
+            pid:0,
+            title: '',
+            link: '',
+            icon: '',
+            sort:1
+        }
+    };
+    var store_model = new Vue({
+        el: "#form-admin",
+        data: model,
+        methods: {
+            doSubmit: function () {
+                $.ajax({
+                    type: 'post',
+                    data: this.model,
+                    url: "{:url('menu/edit')}",
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.status == true) {
+                            layer.msg(data.message, function () {
+                                parent.location.href="{:url('menu/index')}";
+                                //layer_close();
+                            })
+                        } else {
+                            layer.msg(data.message);
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    util.get("{:url('menu/edit')}", {id:"{$edit_id}"},function (data) {
+        store_model.menus = data.menus;
+        store_model.model = data.model;
+    });
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

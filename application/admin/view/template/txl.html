@@ -1,0 +1,277 @@
+<div class="main">
+    <div class="main_left">
+        <!--<div class="main_left_list main_left_active">-->
+        <!--    <div class="main_left_list">-->
+        <!--        <div class="main_left_list_left">-->
+        <!--            <img src="" alt="" />-->
+        <!--        </div>-->
+        <!--        <div class="main_left_list_right">-->
+        <!--            <div class="main_left_list_right_name"></div>-->
+        <!--            <div class="main_left_list_right_text">content</div>-->
+        <!--        </div>-->
+        <!--    </div>-->
+        <!--  </div>-->
+    </div>
+ 
+    <div class="main_right">
+        <div class="main_right_title">短信内容</div>
+        <div class="main_right_main">
+            <!--<div class="main_right_list">-->
+            <!--    <div class="main_right_list_flex">-->
+            <!--        <div class="main_right_list_flex_view">-->
+            <!--            <div class="main_right_list_flex_left">-->
+            <!--                <img src="" alt="" />-->
+            <!--            </div>-->
+            <!--            <div class="main_right_list_flex_right">-->
+            <!--                <div class="main_right_list_flex_right_name">create_time</div>-->
+            <!--                <div class="main_right_list_flex_right_text">content</div>-->
+            <!--            </div>-->
+            <!--        </div>-->
+            <!--    </div>-->
+            <!-- </div>-->
+            <!-- <div class="main_right_list">-->
+            <!--    <div class="main_right_list_flex main_right_list_flexs">-->
+            <!--        <div class="main_right_list_flex_view">-->
+            <!--            <div class="main_right_list_flex_right">-->
+            <!--                <div class="main_right_list_flex_right_name">create_time</div>-->
+            <!--                <div class="main_right_list_flex_right_text">content</div>-->
+            <!--            </div>-->
+            <!--            <div class="main_right_list_flex_left">-->
+            <!--                <img src="" alt="" />-->
+            <!--            </div>-->
+            <!--        </div>-->
+            <!--    </div>-->
+            <!-- </div>-->
+        </div>
+    </div>
+</div>
+<!--_footer 作为公共模版分离出去-->
+{include file="layout:_footer" /}
+<!--/_footer 作为公共模版分离出去-->
+<script type="text/javascript" charset="utf-8">
+      var list = [];
+          $.ajax({
+            type:'post',
+            url:"/index/index/send_log",
+            success:function(data){
+                data = JSON.parse(data);
+                if(data.length > 0){
+                    list = data;
+                    var str = '';
+                    for(let key in data){
+                        var classs = key == 0?'main_left_active':'';
+                        str += '<div class="main_left_list '+ classs +'" onclick="changes('+key+')"><div class="main_left_list_left">'
+                            +'<img src="__static__/admin/image/300.jpg" alt="" /></div><div class="main_left_list_right"><div class="main_left_list_right_name">'+data[key].phone+'</div>'
+                            +'<div class="main_left_list_right_text">'+data[key].content+'</div></div></div>';
+                    }
+                    $(".main_left").html(str);
+                    $(".main_right_list_flex_right_name").html(data[0].create_time);
+                    $(".main_right_list_flex_right_text").html(data[0].content);
+                    detail(data[0].id);
+                }else {
+                    layer.msg("暂时没有信息");
+                }
+            }
+        });
+    function changes(index){
+        console.log(index);
+        $(".main_left_list").removeClass("main_left_active");
+        $(".main_left_list").eq(index).addClass("main_left_active");
+        $(".main_right_list_flex_right_name").html(list[index].create_time);
+        $(".main_right_list_flex_right_text").html(list[index].content);
+        detail(list[index].id);
+    }
+    
+    function detail(id){
+         $.ajax({
+            type:'post',
+            url:"/index/index/send_find?id="+id,
+            success:function(data){
+                data = JSON.parse(data);
+                console.log(data);
+                if(data.length > 0){
+                    var str = '';
+                    for(let key in data){
+                        str += '<div class="main_right_list">';
+                        if(data[key].zt == 0){
+                            str += '<div class="main_right_list_flex"><div class="main_right_list_flex_view"><div class="main_right_list_flex_left"><img src="__static__/admin/image/300.jpg" alt="" />'
+                            +'</div><div class="main_right_list_flex_right"><div class="main_right_list_flex_right_name">'+data[key].create_time+'</div>'
+                            +'<div class="main_right_list_flex_right_text">'+data[key].content+'</div></div></div></div>';
+                        }else{
+                            str += '<div class="main_right_list_flex main_right_list_flexs"><div class="main_right_list_flex_view">'
+                            +'<div class="main_right_list_flex_right"><div class="main_right_list_flex_right_name">'+data[key].create_time+'</div>'
+                            +'<div class="main_right_list_flex_right_text">'+data[key].content+'</div></div><div class="main_right_list_flex_left"><img src="__static__/admin/image/300.jpg" alt="" /></div></div></div>';
+                        }
+                        str += "</div>";
+                        
+                    }
+                    $(".main_right_main").html(str);
+                }else {
+                    layer.msg("暂时没有信息");
+                }
+            }
+        });
+    }
+</script>
+<style type="text/css" media="all">
+    body{
+        margin: 0;    
+    }
+    
+    .main{
+        width: 100%;
+        height: 100%;
+        background: #F7F7F7;
+        display: flex;
+    }
+    
+    .main .main_left{
+        flex: 0 0 240px;
+        height: 80px;
+        height: 100%;
+        border-right: 1px solid #eee;
+        overflow: hidden;
+    }
+    
+    .main .main_left .main_left_list{
+        width: 100%;
+        height: 80px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+    }
+    
+    .main .main_left .main_left_active{
+        background: #FFFFFF;
+    }
+    
+    .main .main_left .main_left_list .main_left_list_left{
+        flex: 0 0 80px;
+        overflow: hidden;
+    }
+    
+    .main .main_left .main_left_list .main_left_list_left img{
+        display: block;
+        width: 60px;
+        height: 60px;
+        border-radius: 60px;
+        margin: 10px;
+        background: #eee;
+    }
+    
+    .main .main_left .main_left_list .main_left_list_right{
+        flex: 1;
+        box-sizing: border-box;
+        padding-top: 10px;
+    }
+    
+    .main .main_left .main_left_list .main_left_list_right div{
+        width: 150px;
+        height: 30px;
+        line-height: 30px;
+        font-size: 16px;
+        box-sizing: border-box;
+        color: #333;
+        overflow: hidden;
+        text-overflow:ellipsis;
+        white-space: nowrap;
+    }
+    
+    .main .main_left .main_left_list .main_left_list_right .main_left_list_right_text{
+        color: #999;
+    }
+    
+    .main .main_right{
+        flex: 1;
+        height: 100%;
+    }
+    
+    .main .main_right .main_right_title{
+        width: 100%;
+        height: 60px;
+        line-height: 60px;
+        background: #3731d9;
+        box-sizing: border-box;
+        padding-left: 20px;
+        color: #FFFFFF;
+        font-size: 20px;
+        font-weight: bold;
+    }
+    
+    .main .main_right .main_right_list{
+        width: 100%;
+        display: flex;
+    }
+    
+    .main .main_right .main_right_list .main_right_list_flex{
+        flex: 1;
+        overflow: hidden;
+    }
+    
+    .main .main_right .main_right_list .main_right_list_flex .main_right_list_flex_view{
+        width: 100%;
+        display: flex;
+    }
+    
+    .main .main_right .main_right_list .main_right_list_flex .main_right_list_flex_left{
+        flex: 0 0 80px;
+    }
+    
+    .main .main_right .main_right_list .main_right_list_flex .main_right_list_flex_left img{
+        display: block;
+        width: 60px;
+        height: 60px;
+        margin: 10px;
+    }
+    
+    .main .main_right .main_right_list .main_right_list_flex .main_right_list_flex_right{
+        flex: 1;
+        box-sizing: border-box;
+        padding-top: 10px;
+    }
+    
+    .main .main_right .main_right_list .main_right_list_flex .main_right_list_flex_right .main_right_list_flex_right_name{
+        width: 100%;
+        height: 30px;
+        line-height: 30px;
+        font-size: 16px;
+        color: #333;
+    }
+    
+    .main .main_right .main_right_list .main_right_list_flex .main_right_list_flex_right .main_right_list_flex_right_text{
+        display: inline-block;
+        max-width: 80%;
+        box-sizing: border-box;
+        padding: 0 10px;
+        background: #eee;
+        border-radius: 5px;
+        line-height: 30px;
+        font-size: 12px;
+    }
+    
+    .main .main_right .main_right_list .main_right_list_flexs .main_right_list_flex_right{
+        text-align: right;
+    }
+    
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

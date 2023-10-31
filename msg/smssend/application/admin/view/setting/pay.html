@@ -1,0 +1,305 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    {include file="layout:_meta" /}
+    <title>系统设置</title>
+</head>
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i>
+    首页<span class="c-gray en">&gt;</span>
+    系统管理<span class="c-gray en">&gt;</span>
+    支付设置<a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a>
+</nav>
+<div class="page-container">
+    <form id="form-admin" class="form form-horizontal">
+        <div id="tab-system" class="HuiTab">
+            <div class="tabBar cl">
+                <span>USDT支付</span>
+                <span>银行卡支付</span>
+                <span>支付宝支付</span>
+                <span>支付宝官方支付</span>
+                <span>微信官方支付</span>
+            </div>
+            <div class="tabCon">
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span> ERC20二维码</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="file" id="erc_qrcode" v-on:change="upImage('erc_qrcode')" style="display: none">
+                        <img  v-bind:src="usdt.erc_qrcode?usdt.erc_qrcode:'__static__/admin/image/upload.png'" v-on:click="imageClick('erc_qrcode')">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>ERC20充币地址：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" v-model="usdt.erc_code" placeholder="请输入系统充值ERC20充币地址" class="input-text">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>TRC20二维码：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="file" id="trc_qrcode"  v-on:change="upImage('trc_qrcode')" style="display: none">
+                        <img  v-bind:src="usdt.trc_qrcode?usdt.trc_qrcode:'__static__/admin/image/upload.png'" v-on:click="imageClick('trc_qrcode')">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>TRC20充币地址：</label>
+                        <div class="formControls col-xs-8 col-sm-9">
+                            <input type="text" v-model="usdt.trc_code" placeholder="请输入商户秘钥" class="input-text">
+                        </div>
+                </div>
+                <div class="row cl">
+                    <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2 mt-20">
+                        <button v-on:click="submitUsdt()" class="btn btn-primary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+                    </div>
+                </div>
+            </div>
+            <div class="tabCon">
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">银行名称：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" v-model="bank.name" >
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">户主姓名：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" v-model="bank.account" >
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">银行卡号：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                       <input type="text" class="input-text" v-model="bank.bank_no" >
+                    </div>
+                </div>
+                <div class="row cl">
+                    <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2 mt-20">
+                        <button v-on:click="submitBank()" class="btn btn-primary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+                    </div>
+                </div>
+            </div>
+            <div class="tabCon">
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">支付宝二维码：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="file" id="qrcode" v-on:change="upImage('qrcode')" style="display: none">
+                        <img  v-bind:src="alipay.qrcode?alipay.qrcode:'__static__/admin/image/upload.png'" v-on:click="imageClick('qrcode')">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">支付宝账号：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" v-model="alipay.account">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2 mt-20">
+                        <button v-on:click="submitAlipay();" class="btn btn-primary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+                    </div>
+                </div>
+            </div>
+            <div class="tabCon">
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2"> 去申请商户：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <i class="Hui-iconfont">&#xe71c;</i>
+                        <a href="https://open.alipay.com/platform/home.htm" target="_blank">https://open.alipay.com/platform/home.htm</a>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">商户ID：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" v-model="zfb.app_id" >
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">异步回调地址：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        {:request()->domain()}<input type="text"  v-model="zfb.notify_url" style="width: 200px" class="input-text" disabled>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">同步回调地址：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        {:request()->domain()}<input type="text" v-model="zfb.return_url" style="width: 200px" class="input-text" disabled>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">公钥：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <textarea class="textarea" v-model="zfb.ali_public_key"></textarea>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">私钥：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <textarea class="textarea" v-model="zfb.private_key"></textarea>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2 mt-20">
+                        <button v-on:click="submitZFB()" class="btn btn-primary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+                    </div>
+                </div>
+            </div>
+            <div class="tabCon">
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2"> 去申请商户：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <i class="Hui-iconfont">&#xe719;</i>
+                        <a href="https://pay.weixin.qq.com/static/applyment_guide/applyment_detail_website.shtml" target="_blank">https://pay.weixin.qq.com/static/applyment_guide/applyment_detail_website.shtml</a>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">公众号ID：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" v-model="wechat.app_id">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">商户ID：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" v-model="wechat.mch_id">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">异步回调地址：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        {:request()->domain()}<input type="text" v-model="wechat.notify_url" style="width: 200px" class="input-text" disabled>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">apiclient_cert.pem证书：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <textarea class="textarea" v-model="wechat.cert_client"></textarea>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">apiclient_key.pem证书：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <textarea class="textarea" v-model="wechat.cert_key"></textarea>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2 mt-20">
+                        <button v-on:click="submitWechat();" class="btn btn-primary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<!--_footer 作为公共模版分离出去-->
+{include file="layout:_footer" /}
+<!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    var model = {
+        usdt: {},
+        alipay: {},
+        bank: {},
+        wechat:{},
+        zfb:{}
+    };
+    var store_model = new Vue({
+        el: "#form-admin",
+        data: model,
+        mounted: function () {
+            this.huiTab();
+        },
+        methods: {
+            huiTab:function () {
+                $("#tab-system").Huitab({
+                    index:0
+                });
+            },
+
+            //点击上传图片规格按钮
+            imageClick:function (select) {
+                document.getElementById(select).click();
+            },
+
+            //上传图片
+            upImage:function (type) {
+                var _this = this;
+                upImage("{:url('index/upload')}", type, function (ret) {
+                    if (ret.status == true) {
+                        switch (type) {
+                             case 'erc_qrcode':
+                                _this.usdt.erc_qrcode = ret.path;
+                                break;
+                            case 'trc_qrcode':
+                                _this.usdt.trc_qrcode = ret.path;
+                                break;
+                            default:
+                                _this.alipay.qrcode = ret.path;
+                                break;
+                        }
+                    }
+                    layer.msg(ret.message);
+                })
+            },
+
+            //USDT支付
+            submitUsdt: function () {
+                layer.load();
+                util.post("{:url('setting/usdt')}",this.usdt,function (data) {
+                    layer.closeAll('loading');
+                    layer.msg(data.message);
+                });
+            },
+
+            //支付宝支付
+            submitAlipay:function () {
+                layer.load();
+                util.post("{:url('setting/alipay')}",this.alipay,function (data) {
+                    layer.closeAll('loading');
+                    layer.msg(data.message);
+                });
+            },
+
+
+            //银行卡支付
+            submitBank:function () {
+                layer.load();
+                util.post("{:url('setting/bank')}",this.bank,function (data) {
+                    layer.closeAll('loading');
+                    layer.msg(data.message);
+                });
+            },
+
+            //银行卡支付
+            submitWechat:function () {
+                layer.load();
+                util.post("{:url('setting/wechat')}",this.wechat,function (data) {
+                    layer.closeAll('loading');
+                    layer.msg(data.message);
+                });
+            },
+
+            //银行卡支付
+            submitZFB:function () {
+                layer.load();
+                util.post("{:url('setting/zfb')}",this.zfb,function (data) {
+                    layer.closeAll('loading');
+                    layer.msg(data.message);
+                });
+            }
+        }
+    });
+
+    util.get("{:url('setting/pay')}",function (data) {
+        store_model.usdt =  data.usdt;
+        store_model.alipay = data.alipay;
+        store_model.bank = data.bank;
+        store_model.zfb = data.zfb;
+        store_model.wechat = data.wechat;
+    });
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

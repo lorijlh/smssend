@@ -1,0 +1,252 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    {include file="layout:_meta" /}
+    <title>文章列表</title>
+</head>
+<body>
+<nav class="breadcrumb">
+    <i class="Hui-iconfont">&#xe67f;</i>
+    首页 <span class="c-gray en">&gt;</span>
+    系统管理 <span class="c-gray en">&gt;</span>
+    文章列表
+    <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+       href="javascript:location.replace(location.href);" title="刷新">
+        <i class="Hui-iconfont">&#xe68f;</i>
+    </a>
+</nav>
+<div id="table" class="page-container">
+    <div class="text-c">
+        <input type="text" class="input-text"  v-model="search.title" style="width:250px" placeholder="请输入标题" v-on:keyup.enter="btnSearch()">
+        <input type="text" class="input-text"  v-model="search.des"  style="width:250px" placeholder="请输入文章标书" v-on:keyup.enter="btnSearch()">
+        <button type="submit" v-on:click="btnSearch()" class="btn btn-success" name=""><i class="Hui-iconfont">&#xe665;</i> 搜文章</button>
+    </div>
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l">
+            <a href="javascript:;" v-on:click="adminAdd()" class="btn btn-primary radius">
+                <i class="Hui-iconfont">&#xe600;</i>
+                添加文章
+            </a>
+             <a href="javascript:;" v-on:click="adminBathDel()" class="btn  btn-danger radius">
+                <i class="Hui-iconfont">&#xe6e2;</i>
+                批量删除
+            </a>
+        </span>
+        <span class="r">共有数据：<strong>{{count}}</strong> 条</span></div>
+    <table class="table table-border table-bordered table-bg">
+        <thead>
+        <tr>
+            <th scope="col" colspan="10">文章列表</th>
+        </tr>
+        <tr class="text-c">
+            <th width="25"><input type="checkbox" name="" value=""></th>
+            <th width="50">ID</th>
+            <th width="100">标题</th>
+            <th width="100">预览图</th>
+            <th width="100">描述</th>
+            <th width="100">阅读量</th>
+            <th width="100">是否显示</th>
+            <th width="100">添加时间</th>
+            <th width="100">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="text-c" v-for="(item,index)  in lists">
+            <td><input type="checkbox" v-bind:value="item.id" name="ids"></td>
+            <td>{{item.id}}</td>
+            <td>{{item.title}}</td>
+            <td>
+                <img  height="80" v-if="item.thumb_img!=''" v-bind:src="item.thumb_img">
+                <i v-else class="Hui-iconfont">&#xe68d;</i>
+            </td>
+            <td>{{item.des}}</td>
+            <td>{{item.read}}</td>
+            <td>
+                <span v-if="item.show==0" class="label label-default radius">不显示</span>
+                <span v-else class="label label-success radius">显示</span>
+            </td>
+            <td>{{item.create_time,'yyyy-MM-dd HH:mm:ss'|timeFormat}}</td>
+            <td class="td-manage">
+                <a v-if="show.status" v-on:click="adminStop($event,item)"  :title="item.show==1?'不显示':'显示'" class="btn radius size-MINI" :class="item.show==1?'btn-warning':'btn-secondary'">
+                    <i class="Hui-iconfont">
+                        <span v-if="item.show==1">&#xe631;</span>
+                        <span v-else>&#xe615;</span>
+                    </i>
+                </a>
+                <a v-if="show.edit" title="编辑" v-bind:data-id="item.id" v-on:click="adminEdit($event)" class="btn btn-success radius size-MINI"><i
+                        class="Hui-iconfont">&#xe6df;</i>
+                </a>
+                <a  v-if="show.remove" title="删除" v-bind:data-id="item.id" v-on:click="btnDel($event,index)" class="btn btn-danger radius size-MINI">
+                    <i class="Hui-iconfont">&#xe6e2;</i>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <!--vueJS分页---start-->
+    <div class="pagination">
+        <ul>
+            <li v-if="current>1"><a v-on:click="current--,pageClick()">上一页</a></li>
+            <li v-if="current==1"><a class="banclick">上一页</a></li>
+            <li v-for="index in indexs"  v-bind:class="{ 'active': current == index}">
+                <a v-on:click="btnClick(index)">{{ index }}</a>
+            </li>
+            <li v-if="current!=total"><a v-on:click="current++,pageClick()">下一页</a></li>
+            <li v-if="current == total"><a class="banclick">下一页</a></li>
+            <li><a>共<i>{{total}}</i>页</a></li>
+        </ul>
+    </div>
+    <!--vueJS分页---end-->
+</div>
+<!--_footer 作为公共模版分离出去-->
+{include file="layout:_footer" /}
+<!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+
+<!--<script type="text/javascript" src="lib/laypage/1.2/laypage.js"></script>-->
+<script type="text/javascript">
+    var models = {
+        show:{},
+
+        count:0,
+        lists: [],//表格数据
+        total:1, //总页数
+        current:1,  //当前页码
+        search:{}   //搜索框
+    };
+
+    var app_model = new Vue({
+        el: "#table",
+        data: models,
+        mounted: function () {
+            this.checkAuth();
+        },
+        methods: {
+            //检测页面显示按钮权限
+            checkAuth:function () {
+                var auth = {
+                    status:'document/status',
+                    edit:'document/edit',
+                    remove:'document/remove'
+                };
+                util.post("{:url('index/auth')}",auth,function (data) {
+                    app_model.show = data;
+                });
+            },
+
+            //上一页,下一页翻页
+            pageClick: function(){
+                initTable("{:url('document/index')}",this.current,this.search);
+            },
+
+            //点击页码
+            btnClick: function(data){
+                if(data != this.current){
+                    this.current = data;
+                    initTable("{:url('document/index')}",this.current,this.search);
+                }
+            },
+            //添加按钮
+            adminAdd:function () {
+                var url = "{:url('document/add')}";
+                var index = layer.open({
+                    type: 2,
+                    maxmin: true,
+                    title: '添加文章',
+                    content: url
+                });
+                layer.full(index);
+            },
+
+            //停用|启用
+            adminStop:function (event, item) {
+                var msg = item.show==1?'确认不显示吗？':'确认显示么？';
+                var status = item.show==1?0:1;
+                layer.confirm(msg,function(){
+                    util.post("{:url('document/status')}",{id:item.id,show:status},function (data) {
+                        if(data.status==true){
+                            item.show = status;
+                            layer.msg(data.message,{icon:1,time:1000});
+                        }else {
+                            layer.msg(data.message,{icon:1,time:1000});
+                        }
+                    });
+                });
+            },
+
+            //删除按钮
+            btnDel: function (event, index) {
+                var _this = $(event.currentTarget);
+                var id = _this.attr('data-id');
+                admin_del("{:url('document/remove')}", id, index);
+            },
+
+            //批量删除
+            adminBathDel:function(){
+                var ids ='';
+                $('input[name="ids"]').each(function(){
+                    if ($(this).is(':checked')){
+                        var tem = $(this).val();
+                        ids += ids==''?tem:','+tem
+                    }
+                });
+                if (ids==''){
+                    layer.msg('请勾选需要删除的数据',{icon:2,time:3000});return;
+                }
+                admin_del("{:url('document/remove')}", ids);
+            },
+
+            //编辑
+            adminEdit: function (event) {
+                var _this = $(event.currentTarget);
+                var id = _this.attr('data-id');
+                var url = "{:url('document/edit')}" + "?id=" + id;
+                var index = layer.open({
+                    type: 2,
+                    maxmin: true,
+                    title: '编辑文章',
+                    content: url
+                });
+                layer.full(index);
+            },
+
+            //搜索框搜索
+            btnSearch:function () {
+                initTable("{:url('document/index')}",this.current,this.search);
+            }
+        },
+
+        //分页
+        computed: {
+            indexs: function () {
+                var left = 1;
+                var right = this.total;
+                var ar = [];
+                if (this.total >= 5) {
+                    if (this.current > 3 && this.current < this.total - 2) {
+                        left = this.current - 2;
+                        right =left + 4;
+                    } else {
+                        if (this.current <= 3) {
+                            left = 1;
+                            right = 5;
+                        } else {
+                            right = this.total;
+                            left = this.total - 4;
+                        }
+                    }
+                }
+                while (left <= right) {
+                    ar.push(left);
+                    left++;
+                }
+                return ar
+            }
+        }
+    });
+    //初始化数据表格
+    initTable("{:url('document/index')}");
+</script>
+</body>
+</html>

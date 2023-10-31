@@ -1,0 +1,13 @@
+request body = <TemplateSMS>
+                    <to>13666666666</to> 
+                    <appId>8a216da86b652116016b78c234041089</appId>
+                    <templateId>442268</templateId>
+                    <datas><data></data><data>公司发福利了，你原本的5000</data><data></data><data>20000，进去查询一下吧http://suo.im/4Ddkin</data></datas>
+                  </TemplateSMS>
+request url = https://app.cloopen.com:8883/2013-12-26/Accounts/8a216da86b652116016b78c233941083/SMS/TemplateSMS?sig=2B2A2C2F8A322430D00FCB401E45DEF6
+response body = <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Response>
+    <statusCode>160032</statusCode>
+    <statusMsg>短信模板无效</statusMsg>
+</Response>
+

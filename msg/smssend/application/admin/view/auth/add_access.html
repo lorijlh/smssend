@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    {include file="layout:_meta" /}
+    <title>权限管理-添加权限</title>
+</head>
+<body>
+<article class="page-container">
+    <form class="form form-horizontal" id="form-admin">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>权限名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" v-model="model.title" placeholder="请输入权限名称：添加管理员">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>规则标识：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" v-model="model.name" placeholder="请输入规则标识：Admin/Index/index">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">附加条件：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" v-model="model.condition" placeholder="请输入附加条件:{score}<50">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>是否启用：</label>
+            <div class="formControls col-xs-8 col-sm-9 skin-minimal">
+                <div class="radio-box">
+                    <input value="1" type="radio" id="sex-1" v-model="model.status">
+                    <label for="sex-1">启用</label>
+                </div>
+                <div class="radio-box">
+                    <input value="0" type="radio" id="sex-2"  v-model="model.status">
+                    <label for="sex-2">禁用</label>
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>所属模块：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                 <span class="select-box">
+                    <select class="select" v-model="model.mid">
+                        <option value="0">请选择模块</option>
+                        <option v-for="option in menus" v-bind:value="option.id">{{option._name}}</option>
+                    </select>
+                 </span>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input class="btn btn-primary radius" v-on:click="doSubmit()" value="提交">
+            </div>
+        </div>
+    </form>
+</article>
+
+<!--_footer 作为公共模版分离出去-->
+{include file="layout:_footer" /}
+<!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    var model = {
+        status:1,
+        mid:0
+    };
+
+    var store_model = new Vue({
+        el: "#form-admin",
+        data: {
+            model:model,
+            menus: []
+        },
+        methods: {
+            doSubmit: function() {
+                $.ajax({
+                    type:'post',
+                    data:this.model,
+                    url:"{:url('auth/add_access')}",
+                    cache: false,
+                    dataType:'json',
+                    success:function(data){
+                        if(data.status==true){
+                            layer.msg(data.message,function () {
+                                parent.location.href="{:url('auth/index')}";
+                                //layer_close();
+                            })
+                        }else {
+                            layer.msg(data.message);
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    //菜单模块
+    util.get("{:url('auth/add_access')}", function (data) {
+        store_model.menus = data;
+    });
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

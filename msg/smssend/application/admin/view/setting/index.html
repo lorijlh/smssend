@@ -1,0 +1,245 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    {include file="layout:_meta" /}
+    <title>系统设置</title>
+</head>
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i>
+    首页<span class="c-gray en">&gt;</span>
+    系统管理<span class="c-gray en">&gt;</span>
+    基本设置<a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a>
+</nav>
+<div class="page-container">
+    <form id="form-admin" class="form form-horizontal">
+        <div id="tab-system" class="HuiTab">
+            <div class="tabBar cl">
+                <span>基本设置</span>
+                <span>网站联系</span>
+                <span>短信设置</span>
+                <span>redis设置</span>
+            </div>
+            <div class="tabCon">
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">
+                        <span class="c-red">*</span>
+                        系统版本：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" v-model="base.version" placeholder="系统版本" class="input-text">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">
+                        <span class="c-red">*</span>
+                        网站名称：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" v-model="base.web_name" placeholder="控制在25个字、50个字节以内" class="input-text">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">
+                        <span class="c-red">*</span>
+                        关键词：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" v-model="base.keywords" placeholder="5个左右,8汉字以内,用英文,隔开" class="input-text">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">
+                        <span class="c-red">*</span>
+                        描述：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" v-model="base.description" placeholder="空制在80个汉字，160个字符以内" class="input-text">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">
+                        <span class="c-red">*</span>
+                        底部版权信息：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" v-model="base.copyright" placeholder="&copy; 2016 H-ui.net" class="input-text">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">
+                        <span class="c-red">*</span>
+                        版权人官网：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" v-model="base.copyright_url" placeholder="请输入版权人官网" class="input-text">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">备案号：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" v-model="base.icp" placeholder="京ICP备00000000号"  class="input-text">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">统计代码：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <textarea class="textarea" v-model="base.statistical"></textarea>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2 mt-20">
+                        <button v-on:click="submitBase();" class="btn btn-primary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+                    </div>
+                </div>
+            </div>
+            <div class="tabCon">
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">联系手机：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" v-model="relation.phone">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">联系邮箱：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" v-model="relation.email">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">微信二维码：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" v-model="relation.wechat">
+                        <a v-on:click="imageClick('wechat')" class="btn btn-success radius">上传二维码</a>
+                        <input type="file" id="wechat" class="input-text" v-on:change="upImage('wechat')" name="file" style="display: none"><br/>
+                    </div>
+                </div>
+				 <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">第三方客服：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <textarea class="textarea" v-model="relation.kefu"></textarea>
+                    </div>
+                </div>
+                <div class="row cl">
+                    <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2 mt-20">
+                        <button v-on:click="submitRelation();" class="btn btn-primary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+                    </div>
+                </div>
+            </div>
+            <div class="tabCon">
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">每条短信单价：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" v-model="sms.price">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2 mt-20">
+                        <button v-on:click="submitRedis();" class="btn btn-primary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+                    </div>
+                </div>
+            </div>
+            <div class="tabCon">
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">端口port：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" v-model="redis.port">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">地址host：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" v-model="redis.host">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <label class="form-label col-xs-4 col-sm-2">密码auth：</label>
+                    <div class="formControls col-xs-8 col-sm-9">
+                        <input type="text" class="input-text" v-model="redis.auth">
+                    </div>
+                </div>
+                <div class="row cl">
+                    <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2 mt-20">
+                        <button v-on:click="submitRedis();" class="btn btn-primary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<!--_footer 作为公共模版分离出去-->
+{include file="layout:_footer" /}
+<!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    var model = {
+        base: {},
+        relation: {},
+        redis: {},
+        sms: {}
+    };
+    var store_model = new Vue({
+        el: "#form-admin",
+        data: model,
+        mounted: function () {
+            this.huiTab();
+        },
+        methods: {
+            huiTab:function () {
+                $("#tab-system").Huitab({
+                    index:0
+                });
+            },
+
+            //点击上传图片规格按钮
+            imageClick:function (select) {
+                document.getElementById(select).click();
+            },
+
+            //上传图片
+            upImage:function (type) {
+                upImage("{:url('index/upload')}", type, function (ret) {
+                    if (ret.status == true) {
+                        store_model.relation.wechat = ret.path;
+                    }
+                    layer.msg(ret.message);
+                })
+            },
+
+            //提交短信配置
+            submitBase: function () {
+                layer.load();
+                util.post("{:url('setting/base')}",this.base,function (data) {
+                    layer.closeAll('loading');
+                    layer.msg(data.message);
+                });
+            },
+
+            //网站联系配置
+            submitRelation:function () {
+                layer.load();
+                util.post("{:url('setting/relation')}",this.relation,function (data) {
+                    layer.closeAll('loading');
+                    layer.msg(data.message);
+                });
+            },
+
+
+            //redis设置
+            submitRedis:function () {
+                layer.load();
+                util.post("{:url('setting/redis')}",this.redis,function (data) {
+                    layer.closeAll('loading');
+                    layer.msg(data.message);
+                });
+            }
+        }
+    });
+
+    util.get("{:url('setting/index')}",function (data) {
+        store_model.base =  data.base;
+        store_model.relation = data.relation;
+        store_model.redis = data.redis;
+        store_model.sms = data.sms;
+    });
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

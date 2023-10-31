@@ -1,0 +1,79 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    {include file="layout:_meta" /}
+    <title>添加短信模板 - 短信模板管理</title>
+</head>
+<body>
+<article class="cl pd-20">
+    <form class="form form-horizontal" id="form-admin">
+        <article v-if="model.params.length==0" class="page-404 minWP text-c">
+        	<p class="error-title"><i class="Hui-iconfont va-m">&#xe688;</i>
+        		<span class="va-m"> 没有设置变量参数</span>
+        	</p>
+        	<p class="error-description">不好意思，您没有设置模板变量</p>
+        	<p class="error-info">您可以重新编辑模板！</p>
+        </article>
+        <div v-for="(item,index)  in model.params" class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">{{index}}</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" placeholder="请输入要替换的内容" v-model="model.params[index]" >
+            </div>
+        </div>
+
+
+        <div class="row cl" v-if="model.params.length>0">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input class="btn btn-primary radius" v-on:click="doSubmit()" value="提交">
+            </div>
+        </div>
+    </form>
+</article>
+
+<!--_footer 作为公共模版分离出去-->
+{include file="layout:_footer" /}
+<!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    var model = {
+        id:"{$edit_id}",
+        params:[]
+    };
+
+    var store_model = new Vue({
+        el: "#form-admin",
+        data: {
+            model:model
+        },
+        methods: {
+            doSubmit: function() {
+                $.ajax({
+                    type:'post',
+                    data:this.model,
+                    url:"{:url('template/params')}",
+                    cache: false,
+                    dataType:'json',
+                    success:function(data){
+                        if(data.status==true){
+                            layer.msg(data.message,function () {
+                                parent.location.href="{:url('template/index')}";
+                            })
+                        }else {
+                            layer.msg(data.message);
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    //菜单模块
+    util.get("{:url('template/params')}",{id:"{$edit_id}"},function (data) {
+        store_model.model.params = data;
+    });
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

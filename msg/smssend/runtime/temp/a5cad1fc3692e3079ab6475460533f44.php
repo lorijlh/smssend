@@ -1,0 +1,117 @@
+<?php /*a:1:{s:54:"D:\php\smssend\application\admin\view\index\login.html";i:1661403501;}*/ ?>
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="<?php echo Config::get('base.keywords'); ?>">
+    <meta name="description" content="<?php echo Config::get('base.description'); ?>">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="/static/admin/hui/lib/html5shiv.js"></script>
+    <script type="text/javascript" src="/static/admin/hui/lib/respond.min.js"></script>
+    <![endif]-->
+    <link  rel="stylesheet" type="text/css" href="/static/admin/hui/static/h-ui/css/H-ui.min.css" />
+    <link  rel="stylesheet" type="text/css" href="/static/admin/hui/static/h-ui.admin/css/H-ui.login.css"/>
+    <link  rel="stylesheet" type="text/css" href="/static/admin/hui/static/h-ui.admin/css/style.css"/>
+    <link  rel="stylesheet" type="text/css" href="/static/admin/hui/lib/Hui-iconfont/1.0.8/iconfont.css" />
+    <!--[if IE 6]>
+    <script type="text/javascript" src="/static/admin/hui/lib/DD_belatedPNG_0.0.8a-min.js" ></script>
+    <script>DD_belatedPNG.fix('*');</script>
+    <![endif]-->
+    <title><?php echo Config::get('base.web_name'); ?> - &#20992;&#23458;&#28304;&#30721;&#32593;</title>
+</head>
+<body>
+<a href="/"><div class="header"></div></a>
+<div class="loginWraper">
+    <div id="loginform" class="loginBox">
+        <h2>登录</h2>
+        <form class="form form-horizontal" >
+            <div class="row cl">
+                <label class="form-label col-xs-3"><i class="Hui-iconfont">&#xe60d;</i></label>
+                <div class="formControls col-xs-8">
+                    <input  v-model="model.username" type="text" placeholder="请输入账号" class="input-text size-L">
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3"><i class="Hui-iconfont">&#xe60e;</i></label>
+                <div class="formControls col-xs-8">
+                    <input  v-model="model.password" type="password" placeholder="请输入密码" class="input-text size-L">
+                </div>
+            </div>
+            <div class="row cl">
+                <div class="formControls col-xs-8 col-xs-offset-3">
+                    <input v-model="model.verify" class="input-text size-L" type="text" placeholder="请输入右边验证码" style="width:150px;" v-on:keyup.enter="doSubmit()">
+                    <img class="verifyNew" src="<?php echo captcha_src('login'); ?>" onclick="verifyNew()"> <a onclick="verifyNew()" href="javascript:;">看不清，换一张</a> </div>
+            </div>
+            <div class="row cl">
+                <div class="formControls col-xs-8 col-xs-offset-3">
+                    <label for="online">
+                        <input type="checkbox"  id="online" v-model="model.remember">
+                        使我保持登录状态</label>
+                    <a style="float: right" href="<?php echo url('index/register'); ?>">没有账号？去注册</a>
+                </div>
+            </div>
+            <div class="row cl">
+                <div class="formControls col-xs-8 col-xs-offset-3">
+                    <button  type="button" v-on:click="doSubmit()" class="btn btn-block btn-success radius size-L">&nbsp;登&nbsp;&nbsp;&nbsp;&nbsp;录&nbsp;</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="footer">Copyright  <?php echo Config::get('base.copyright'); ?>   <?php echo Config::get('base.icp'); ?></div>
+<script type="text/javascript" src="/static/admin/hui/lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="/static/admin/hui/static/h-ui/js/H-ui.min.js"></script>
+<script type="text/javascript" src="/static/admin/hui/lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="/static/admin/js/vue.js"></script>
+<script type="text/javascript" src="/static/admin/util.js"></script>
+<script type="text/javascript" src="/static/admin/js/common.js"></script>
+<script type="text/javascript">
+    util.get("<?php echo url('index/member'); ?>",function (data) {
+        var model = (data==false)?{remember:false}:data;
+        var vm = new Vue({
+            el: "#loginform",
+            data: {
+                model:model
+            },
+            methods: {
+                doSubmit: function() {
+                    $.ajax({
+                        type:'post',
+                        data:this.model,
+                        url:"<?php echo url('index/login'); ?>",
+                        cache: false,
+                        dataType:'json',
+                        success:function(data){
+                            if(data.status==true){
+                                layer.msg(data.message,function () {
+                                    parent.location.href="<?php echo url('Index/index'); ?>";
+                                })
+                            }else {
+                                layer.msg(data.message);
+                                verifyNew();
+                            }
+                        }
+                    });
+                }
+            }
+        })
+    });
+
+    //刷新验证码
+    function verifyNew() {
+        var src = $('.verifyNew').attr('src');
+        if(src.indexOf("?")!=-1) {
+            $('.verifyNew').attr('src',src+'&random='+Math.random());
+        } else{
+            $('.verifyNew').attr('src',src+'?'+Math.random());
+        }
+    }
+
+</script>
+
+</body>
+</html>

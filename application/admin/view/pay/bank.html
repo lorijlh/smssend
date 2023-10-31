@@ -1,0 +1,93 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    {include file="layout:_meta" /}
+    <title>添加管理员 - 管理员管理</title>
+</head>
+<body>
+<article class="cl pd-20">
+    <form class="form form-horizontal" id="form-admin">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"> 充值方式：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="银行卡" disabled>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"> 充值金额：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$price} 元" disabled>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"> 银行：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$config['name']}" disabled>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"> 户主：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$config['account']}" disabled>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"> 卡号：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$config['bank_no']}" disabled>
+                <p></p>
+                <span style="color: #f37b1d">请在支付完成后点击【我已支付】加速入帐时间。</span>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input type="button" class="btn btn-default radius" v-on:click="onClose()" value="关闭">
+                <input type="button" class="btn btn-primary radius" v-on:click="doSubmit()" value="我已支付">
+            </div>
+        </div>
+    </form>
+</article>
+
+<!--_footer 作为公共模版分离出去-->
+{include file="layout:_footer" /}
+<!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    var model = {
+     
+    };
+    var store_model = new Vue({
+        el: "#form-admin",
+        data: model,
+        methods: {
+            doSubmit: function () {
+                $.ajax({
+                    type: 'post',
+                    data: this.model,
+                    url: "{:url('pay/recharge')}?goods_id={$goods_id}&type=bank",
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.status == true) {
+                            layer.msg(data.message, function () {
+                                layer_close();
+                            })
+                        } else {
+                            layer.msg(data.message);
+                        }
+                    }
+                });
+            },
+
+            onClose: function () {
+                layer_close();
+            }
+        }
+       
+    });
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

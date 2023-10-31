@@ -1,0 +1,217 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    {include file="layout:_meta" /}
+    <title>短信服务商管理</title>
+</head>
+<body>
+<nav class="breadcrumb">
+    <i class="Hui-iconfont">&#xe67f;</i>
+    首页 <span class="c-gray en">&gt;</span>
+    服务商管理 <span class="c-gray en">&gt;</span>
+    短信管理
+    <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+       href="javascript:location.replace(location.href);" title="刷新">
+        <i class="Hui-iconfont">&#xe68f;</i>
+    </a>
+</nav>
+<div id="table" class="page-container">
+    <div class="text-c">
+        <input type="text" class="input-text"  v-model="search.name" style="width:250px" placeholder="请输入短信服务商名称" v-on:keyup.enter="btnSearch()">
+        <button type="submit" v-on:click="btnSearch()" class="btn btn-success" name=""><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+    </div>
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l">
+            <a href="javascript:;" v-on:click="adminAdd()" class="btn btn-primary radius">
+                <i class="Hui-iconfont">&#xe600;</i>
+                添加服务商
+            </a>
+        </span>
+        <span class="r">共有数据：<strong>{{count}}</strong> 条</span></div>
+    <table class="table table-border table-bordered table-bg">
+        <thead>
+        <tr>
+            <th scope="col" colspan="10">服务商列表</th>
+        </tr>
+        <tr class="text-c">
+            <th width="50">ID</th>
+            {eq name="group_id" value="1"} 
+            <th width="100">服务商类别</th>
+            <th width="100">测试发送</th>
+            {/eq}
+            <th width="100">服务商名称</th>
+            <th width="100">类名</th>
+            <th width="100">账号</th>
+            <th width="100">秘钥</th>
+            <th width="100">签名</th>
+            <th width="100">转态</th>
+            <th width="100">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="text-c" v-for="(item,index)  in lists">
+            <td>{{item.id}}</td>
+            {eq name="group_id" value="1"}
+            <td>
+                <span class="label label-success radius" v-if="item.uid>0">当前账号使用</span>
+                <span class="label radius" v-else>系统服务商</span>
+            </td>
+            <td>
+                <span class="label label-success radius" v-if="item.is_test">测试</span>
+                <span class="label radius" v-else>真发</span>
+            </td>
+            {/eq}
+            <td>{{item.name}}</td>
+            <td>{{item.class_name}}</td>
+            <td>{{item.account}}</td>
+            <td>{{item.password}}</td>
+            <td>{{item.signature}}</td>
+            <td>
+                <span class="label label-success radius" v-if="item.id=='{:$Think.config.sms.service_id}'">正在使用</span>
+                <span class="label radius" v-else>未使用</span>
+            </td>
+            <td class="td-manage">
+                <a v-if="show.edit" title="选定服务商和模板测试"  v-on:click="sendSms(item.id)" class="btn radius size-MINI"><i
+                        class="Hui-iconfont">&#xe68a;</i>
+                </a>
+                <a v-if="show.edit" title="编辑" v-bind:data-id="item.id" v-on:click="adminEdit($event)" class="btn btn-success radius size-MINI"><i
+                        class="Hui-iconfont">&#xe6df;</i>
+                </a>
+                <a v-if="show.remove" title="删除" v-bind:data-id="item.id" v-on:click="btnDel($event,index)"  class="btn btn-danger radius size-MINI">
+                    <i class="Hui-iconfont">&#xe6e2;</i>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <!--vueJS分页---start-->
+    <div class="pagination">
+        <ul>
+            <li v-if="current>1"><a v-on:click="current--,pageClick()">上一页</a></li>
+            <li v-if="current==1"><a class="banclick">上一页</a></li>
+            <li v-for="index in indexs"  v-bind:class="{ 'active': current == index}">
+                <a v-on:click="btnClick(index)">{{ index }}</a>
+            </li>
+            <li v-if="current!=total"><a v-on:click="current++,pageClick()">下一页</a></li>
+            <li v-if="current == total"><a class="banclick">下一页</a></li>
+            <li><a>共<i>{{total}}</i>页</a></li>
+        </ul>
+    </div>
+    <!--vueJS分页---end-->
+</div>
+<!--_footer 作为公共模版分离出去-->
+{include file="layout:_footer" /}
+<!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+
+<!--<script type="text/javascript" src="lib/laypage/1.2/laypage.js"></script>-->
+<script type="text/javascript">
+    var models = {
+        show:{},
+
+        count:0,
+        lists: [],//表格数据
+        total:1, //总页数
+        current:1,  //当前页码
+        search:{}   //搜索框
+    };
+
+    var app_model = new Vue({
+        el: "#table",
+        data: models,
+        mounted: function () {
+            this.checkAuth();
+        },
+        methods: {
+            //检测页面显示按钮权限
+            checkAuth:function () {
+                var auth = {
+                    edit:'service/edit',
+                    remove:'service/remove'
+                };
+                util.post("{:url('index/auth')}",auth,function (data) {
+                    app_model.show = data;
+                });
+            },
+
+
+
+            //模板选择测试
+            sendSms:function(sid){
+                var url = "{:url('service/send')}" + "?id=" + sid;
+                admin_edit('模板选择测试', url,'800','500');
+            },
+
+            //上一页,下一页翻页
+            pageClick: function(){
+                initTable("{:url('service/index')}",this.current,this.search);
+            },
+
+            //点击页码
+            btnClick: function(data){
+                if(data != this.current){
+                    this.current = data;
+                    initTable("{:url('service/index')}",this.current,this.search);
+                }
+            },
+            //添加按钮
+            adminAdd:function () {
+                var url = "{:url('service/add')}";
+                admin_add('添加服务商',url,'800','500');
+            },
+
+            //删除按钮
+            btnDel: function (event, index) {
+                var _this = $(event.currentTarget);
+                var id = _this.attr('data-id');
+                admin_del("{:url('service/remove')}", id, index);
+            },
+
+            //编辑
+            adminEdit: function (event) {
+                var _this = $(event.currentTarget);
+                var id = _this.attr('data-id');
+                var url = "{:url('service/edit')}" + "?id=" + id;
+                admin_edit('编辑服务商', url,'800','500');
+            },
+
+            //搜索框搜索
+            btnSearch:function () {
+                initTable("{:url('service/index')}",this.current,this.search);
+            }
+        },
+
+        //分页
+        computed: {
+            indexs: function () {
+                var left = 1;
+                var right = this.total;
+                var ar = [];
+                if (this.total >= 5) {
+                    if (this.current > 3 && this.current < this.total - 2) {
+                        left = this.current - 2;
+                        right =left + 4;
+                    } else {
+                        if (this.current <= 3) {
+                            left = 1;
+                            right = 5;
+                        } else {
+                            right = this.total;
+                            left = this.total - 4;
+                        }
+                    }
+                }
+                while (left <= right) {
+                    ar.push(left);
+                    left++;
+                }
+                return ar
+            }
+        }
+    });
+    //初始化数据表格
+    initTable("{:url('service/index')}");
+</script>
+</body>
+</html>

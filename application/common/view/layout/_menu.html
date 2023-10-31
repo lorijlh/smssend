@@ -1,0 +1,27 @@
+<aside class="Hui-aside">
+	<div class="menu_dropdown bk_2">
+		    <dl>
+				<dt><i class="Hui-iconfont">&#xe64f;</i>
+				<a style="text-decoration:none;" data-href="{:url('index/console')}" data-title="控制台" href="javascript:void(0)"> 控制台</a>
+				</dt>
+			</dl>
+			<dl>
+				<dt><i class="Hui-iconfont">&#xe64f;</i>
+					<a style="text-decoration:none;" data-href="{$Think.session.im_login}" data-title="IM系统" href="javascript:void(0)"> IM系统</a>
+				</dt>
+			</dl>
+		{volist name="menus_lists" id="menus"}
+			<dl>
+				<dt><i class="Hui-iconfont {$menus.icon}"></i> {$menus.title}<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+				<dd>
+					<ul>
+						{volist name="menus['_data']" id="menu"}
+							<li><a data-href="{$menu.link}" data-title="{$menu.title}" href="javascript:void(0)"> {$menu.title}</a></li>
+						{/volist}
+					</ul>
+				</dd>
+			</dl>
+		{/volist}
+	</div>
+</aside>
+<div class="dislpayArrow hidden-xs"><a class="pngfix" href="javascript:void(0);" onClick="displaynavbar(this)"></a></div>
